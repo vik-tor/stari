@@ -1,0 +1,31 @@
+@import url('../../node_modules/bootstrap-icons/font/bootstrap-icons.min.css');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.input,
+.select,
+.textarea {
+  @apply text-xs border-2 border-secondary border-opacity-60 ease-linear transition-all
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+  @apply outline-0 ring-0 border-opacity-100
+}
+
+.input,
+.select {
+  @apply h-8;
+  @apply min-h-8;
+}
+
+.radio-group {
+  @apply text-sm font-medium text-gray-900 bg-neutral border border-secondary rounded;
+}
+
+.radio-group li:first {
+  @apply border-b border-gray-200 rounded;
+}
