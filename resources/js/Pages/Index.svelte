@@ -76,10 +76,11 @@
         >
             <div class="flex flex-col items-center justify-between h-full">
                 <div class="flex flex-col items-center">
-                    <div class="flex items-center h-12 -mb-2">
-                        <button class="focus:outline-none">
-                            <i class="bi bi-card-heading text-lg" />
-                        </button>
+                    <div class="flex flex-col items-center h-3 my-4">
+                        <!-- <button class="focus:outline-none">
+							<i class="bi bi-card-heading text-lg" />
+						</button> -->
+                        <img src="../../../logo.png" alt="Logo" class="w-14" />
                     </div>
                     <ul
                         tabindex="-1"
@@ -106,7 +107,7 @@
                                 </div>
                             </li>
                         {/each}
-                        <li class="my-2">
+                        <li class="my-1">
                             <div
                                 class="md:tooltip md:tooltip-right"
                                 data-tip="Add notebook"
@@ -115,7 +116,7 @@
                                     class="text-accent py-1"
                                     onclick="new_notebook_modal.showModal()"
                                 >
-                                    <i class="bi bi-journal-plus text-lg" />
+                                    <i class="bi bi-plus-square text-lg" />
                                 </button>
                             </div>
                         </li>
@@ -212,7 +213,7 @@
                                                 />
                                                 <span
                                                     class="text-sm font-medium"
-                                                    >Delete</span
+                                                    >Remove</span
                                                 >
                                             </button>
                                         </li>
@@ -749,28 +750,17 @@
 
             <form action="">
                 <fieldset
-                    class="border border-secondary border-opacity-50 p-3 w-4/5 mx-auto my-2"
+                    class="border border-secondary border-opacity-50 p-3 w-full my-2"
                 >
                     <legend class="text-xs uppercase font-bold"
                         >Backup & Import</legend
                     >
-                    <div class="my-2">
-                        <legend class="text-xs capitalize font-medium"
-                            >Backup</legend
+                    <fieldset
+                        class="border border-secondary border-opacity-50 py-1 px-2 mx-auto"
+                    >
+                        <legend class="text-xs capitalize font-bold"
+                            >Import entries</legend
                         >
-                        <hr />
-                        <button
-                            class="btn btn-neutral btn-ghost btn-sm ml-auto text-xs rounded"
-                            value="Download"
-                        >
-                            Download
-                        </button>
-                    </div>
-                    <div class="my-2">
-                        <legend class="text-xs capitalize font-medium"
-                            >Import</legend
-                        >
-                        <hr />
                         <div
                             class="flex items-center justify-center w-full max-w-lg mt-3 mb-2"
                         >
@@ -793,7 +783,7 @@
                                     </div>
                                 {:else}
                                     <div
-                                        class="flex flex-col items-center justify-center pt-5 pb-6 border-2 border-secondary border-opacity-50 border-dashed rounded hover:border-neutral"
+                                        class="flex flex-col items-center justify-center py-4 border-2 border-secondary border-opacity-50 border-dashed rounded hover:border-neutral w-full"
                                     >
                                         <i class="bi bi-cloud-upload" />
                                         <p
@@ -839,7 +829,7 @@
                                     class="select select-sm bg-neutral placeholder-gray-500 rounded-md w-full"
                                     bind:value={fileImport.notebook}
                                 >
-                                    <option value="0" class="py-1"
+                                    <option value="0" class="py-1" selected
                                         >Create new</option
                                     >
                                     <hr
@@ -851,13 +841,6 @@
                                         >
                                     {/each}
                                 </select>
-                                {#if $notebook_form.errors.title}
-                                    <label class="label" for="title">
-                                        <span class="label-text-alt text-error"
-                                            >{$notebook_form.errors.title}</span
-                                        >
-                                    </label>
-                                {/if}
                             </div>
                         </div>
                         <div class="flex gap-2 mt-3 mb-2">
@@ -873,87 +856,19 @@
                                 value="Save"
                             />
                         </div>
+                    </fieldset>
+                    <div class="my-2">
+                        <button
+                            class="btn btn-secondary btn-block ml-auto text-xs rounded justify-between capitalize"
+                        >
+                            <span>Export notes</span>
+                            <span
+                                ><i class="bi bi-chevron-right text-sm" /></span
+                            >
+                        </button>
                     </div>
                 </fieldset>
             </form>
-
-            <!-- <form
-                on:submit|preventDefault={submitNotebookForm}
-                class="w-full"
-            >
-                <div class="flex flex-col items-start pt-12 md:py-12 lg:py-2">
-                    <h3 class="text-sm font-semibold leading-none lg:mt-1 px-4">
-                        Add Notebook
-                    </h3>
-                    <hr
-                        class="w-full border border-secondary border-opacity-50 mt-2 mr-auto"
-                    />
-                    <div class="w-full px-4">
-                        <div class="form-control">
-                            <label class="label font-medium py-2" for="title">
-                                <span
-                                    class="label-text text-xs text-slate-900 dark:text-slate-50"
-                                    >Title</span
-                                >
-                            </label>
-                            <input
-                                type="text"
-                                class="input input-sm bg-neutral placeholder-gray-500 rounded-md mb-2"
-                                bind:value={notebook_form.title}
-                            />
-                            {#if $notebook_form.errors.title}
-                                <label class="label" for="title">
-                                    <span class="label-text-alt text-error"
-                                        >{$notebook_form.errors.title}</span
-                                    >
-                                </label>
-                            {/if}
-                        </div>
-                        <div class="form-control">
-                            <label class="label font-medium py-2" for="icon">
-                                <span
-                                    class="label-text text-xs text-slate-900 dark:text-slate-50"
-                                    >Category</span
-                                >
-                            </label>
-                            <select
-                                class="select select-sm bg-neutral placeholder-gray-500 rounded-md mb-2"
-                                bind:value={notebook_form.notebook_category_id}
-                            >
-                                <option disabled selected class="text-gray-200"
-                                    >Select</option
-                                >
-                                {#each categories as category}
-                                    <option value={category.id}>
-                                        {category.name}
-                                    </option>
-                                {/each}
-                            </select>
-                            {#if $notebook_form.errors.notebook_category_id}
-                                <label class="label" for="category">
-                                    <span class="label-text-alt text-error"
-                                        >{$notebook_form.errors
-                                            .notebook_category_id}</span
-                                    >
-                                </label>
-                            {/if}
-                        </div>
-
-                        <div class="flex gap-2 mt-3 mb-2">
-                            <button
-                                class="btn btn-neutral btn-ghost btn-sm max-xs:btn-block ml-auto text-xs rounded"
-                                >Cancel</button
-                            >
-                            <button
-                                class="btn btn-accent btn-sm max-xs:btn-block text-white text-xs rounded"
-                                type="submit"
-                                disabled={$notebook_form.processing}
-                                >Save</button
-                            >
-                        </div>
-                    </div>
-                </div>
-            </form> -->
         </div>
     </form>
     <form method="dialog" class="modal-backdrop">
