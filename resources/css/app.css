@@ -7,25 +7,36 @@
 .input,
 .select,
 .textarea {
-  @apply text-xs border-2 border-secondary border-opacity-60 ease-linear transition-all
+	@apply text-xs border-2 border-secondary border-opacity-60 ease-linear transition-all
+}
+
+textarea {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	width: 100%;
 }
 
 .input:focus,
 .select:focus,
 .textarea:focus {
-  @apply outline-0 ring-0 border-opacity-100
+	@apply outline-0 ring-0 border-opacity-100
 }
 
 .input,
 .select {
-  @apply h-8;
-  @apply min-h-8;
+	@apply h-8;
+	@apply min-h-8;
+}
+
+.select {
+	font-weight: initial;
 }
 
 .radio-group {
-  @apply text-sm font-medium text-gray-900 bg-neutral border border-secondary rounded;
+	@apply text-sm font-medium text-gray-900 bg-neutral border border-secondary rounded;
 }
 
 .radio-group li:first {
-  @apply border-b border-gray-200 rounded;
+	@apply border-b border-gray-200 rounded;
 }

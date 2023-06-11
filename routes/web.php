@@ -6,6 +6,7 @@ use App\Http\Controllers\AppController;
 use App\Http\Controllers\EntryController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\NotebookController;
+use App\Http\Controllers\NotebookCategoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,7 +16,7 @@ use App\Http\Controllers\NotebookController;
 
 Route::get('/', [AppController::class, 'index'])->name('app');
 
-Route::post('/import', [AppController::class, 'parse'])->name('import');
+Route::post('import', [AppController::class, 'parse'])->name('import');
 
 Route::resource('notebooks', NotebookController::class)->only('store', 'update', 'destroy');
 Route::resource('categories', NotebookCategoryController::class)->only('store', 'update', 'destroy');

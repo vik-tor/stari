@@ -23,10 +23,5 @@ use App\Http\Controllers\NotebookCategoryController;
 */
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+	return $request->user();
 });
-
-Route::resource('notebooks', NotebookController::class)->only('index', 'store', 'update', 'destroy');
-Route::resource('categories', NotebookCategoryController::class)->only('index', 'store', 'update', 'destroy');
-Route::resource('entries', EntryController::class)->only('store', 'update', 'destroy');
-Route::resource('tags', TagController::class)->only('store', 'update', 'destroy');
