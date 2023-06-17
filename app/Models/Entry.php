@@ -7,7 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Entry extends Model
 {
-  use HasFactory;
+	use HasFactory;
 
-  protected $guarded = [];
+	protected $guarded = [];
+
+	protected $casts = [
+		'created_at' => 'datetime:Y-m-d H:i:s',
+	];
 }

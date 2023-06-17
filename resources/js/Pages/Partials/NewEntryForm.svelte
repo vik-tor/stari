@@ -1,20 +1,38 @@
 <script>
     import { useForm } from "@inertiajs/svelte";
+    import { format } from "date-fns";
+
+    export let notebook;
 
     const entryForm = useForm({
         title: "",
         body: "",
-        starred: false,
-        notebook_id: null,
-        created_at: Date.now(),
+        notebook_id: notebook,
+        tags: [],
+        created_at: format(Date.now(), "yyyy-MM-dd hh:mm:ss"),
     });
+
+    let tag;
+    const addTag = (e) => {
+        if (!$entryForm.tags.includes(e.target.value))
+            $entryForm.tags.push(e.target.value);
+        $entryForm.tags = $entryForm.tags;
+        tag = "";
+    };
+    const delTag = (e) => {
+        $entryForm.tags = $entryForm.tags.filter((v) => {
+            return v !== e;
+        });
+        $entryForm.tags = $entryForm.tags;
+        tag = "";
+    };
 
     // Entry forms:
     // richtext (journal, notes, list, code)
     // simplified (quicknotes, snippets)
 
     const submitEntryForm = () => {
-        router.post("entries", entryForm);
+        $entryForm.post("entries", {});
     };
 </script>
 
@@ -32,7 +50,15 @@
                     <input
                         type="text"
                         class="input input-sm bg-neutral placeholder-gray-500 rounded"
+                        bind:value={$entryForm.title}
                     />
+                    {#if $entryForm.errors.title}
+                        <label class="label" for="category">
+                            <span class="label-text-alt text-error"
+                                >{$entryForm.errors.title}</span
+                            >
+                        </label>
+                    {/if}
                 </div>
                 <div class="form-control">
                     <label class="label font-medium" for="date">
@@ -42,10 +68,17 @@
                         >
                     </label>
                     <input
-                        type="datetime-local"
-                        value=""
+                        type="datetime"
                         class="input input-sm bg-neutral placeholder-gray-500 rounded"
+                        bind:value={$entryForm.created_at}
                     />
+                    {#if $entryForm.errors.created_at}
+                        <label class="label" for="category">
+                            <span class="label-text-alt text-error"
+                                >{$entryForm.errors.created_at}</span
+                            >
+                        </label>
+                    {/if}
                 </div>
                 <div class="form-control">
                     <label class="label font-medium" for="company">
@@ -54,10 +87,44 @@
                             >Tags</span
                         >
                     </label>
-                    <input
-                        type="text"
-                        class="input input-sm bg-neutral placeholder-gray-500 rounded"
-                    />
+                    <div
+                        class="inline-flex flex-wrap items-center gap-1 text-xs border-2 border-secondary border-opacity-60 p-1"
+                    >
+                        {#if $entryForm.tags !== null}
+                            <div class="inline-flex flex-wrap gap-1">
+                                {#each $entryForm.tags as tg}
+                                    <div
+                                        class="badge badge-secondary badge-lg text-sm relative rounded group px-1"
+                                    >
+                                        <span class="">{tg}</span>
+                                        <!-- svelte-ignore a11y-click-events-have-key-events -->
+                                        <span
+                                            class="text-white ml-1"
+                                            on:click={delTag(tg)}
+                                        >
+                                            <i class="bi bi-x" />
+                                        </span>
+                                    </div>
+                                {/each}
+                            </div>
+                        {/if}
+                        <div class="w-auto">
+                            <input
+                                type="text"
+                                class="input input-sm border-none bg-primary placeholder-gray-500 rounded"
+                                bind:value={tag}
+                                on:change={addTag}
+                            />
+                        </div>
+                    </div>
+
+                    {#if $entryForm.errors.tags}
+                        <label class="label" for="category">
+                            <span class="label-text-alt text-error"
+                                >{$entryForm.errors.tags}</span
+                            >
+                        </label>
+                    {/if}
                 </div>
             </div>
         </div>
@@ -76,7 +143,15 @@
                         rows="16"
                         cols="70"
                         class="textarea bg-neutral placeholder-gray-500 rounded"
+                        bind:value={$entryForm.body}
                     />
+                    {#if $entryForm.errors.body}
+                        <label class="label" for="category">
+                            <span class="label-text-alt text-error"
+                                >{$entryForm.errors.body}</span
+                            >
+                        </label>
+                    {/if}
                 </div>
                 <div class="flex justify-end gap-2 mt-3">
                     <button
@@ -85,7 +160,8 @@
                     >
                     <button
                         class="btn btn-accent btn-sm max-xs:btn-block text-white text-xs rounded"
-                        :disabled="notebookForm.processing">Save</button
+                        type="submit"
+                        :disabled="entryForm.processing">Save</button
                     >
                 </div>
             </div>

@@ -8,6 +8,8 @@
     import RemoveNotebookForm from "./Partials/RemoveNotebookForm.svelte";
     import SearchForm from "./Partials/SearchForm.svelte";
 
+    import { format, parse } from "date-fns";
+
     export let notebooks;
     export let categories;
 
@@ -18,10 +20,12 @@
         notebook = notebooks.find((obj) => {
             return obj.id == id;
         });
+        notebook = notebook;
+        console.log(notebook.id);
     };
     const showEntry = (id) => {
         view = notebook.entries.find((o) => {
-            return o.id == id;
+            return o.id === id;
         });
     };
 
@@ -42,49 +46,48 @@
                 <div class="flex flex-col items-center">
                     <div class="flex flex-col items-center h-3 my-4">
                         <!-- <button class="focus:outline-none">
-							<i class="bi bi-card-heading text-lg" />
-						</button> -->
+													<i class="bi bi-card-heading text-lg" />
+												</button> -->
                         <img src="../../../logo.png" alt="Logo" class="w-4" />
                     </div>
-                    <ul
-                        tabindex="-1"
-                        class="menu menu-compact w-full rounded-none items-center"
-                    >
+                    <div class="flex flex-col w-full items-center">
                         {#each notebooks as nb}
-                            <li
-                                class="border-b border-secondary border-opacity-50"
+                            <button
+                                class="border-b border-primary border-opacity-50 px-2 py-3 mb-1"
+                                on:click={listEntries(nb.id)}
                             >
                                 <div
                                     class="md:tooltip md:tooltip-right"
                                     data-tip={nb.name}
                                 >
-                                    <button
-                                        class="py-1"
-                                        on:click={listEntries(nb.id)}
+                                    <span
+                                        class={nb.id == notebook.id
+                                            ? "text-accent"
+                                            : ""}
                                     >
                                         <i
                                             class="bi bi-{showIcon(
                                                 nb.notebook_category_id
                                             )} text-lg"
                                         />
-                                    </button>
+                                    </span>
                                 </div>
-                            </li>
+                            </button>
                         {/each}
-                        <li class="my-1">
+                        <button
+                            class="px-2 py-3"
+                            onclick="newNotebook_modal.showModal()"
+                        >
                             <div
                                 class="md:tooltip md:tooltip-right"
                                 data-tip="Add notebook"
                             >
-                                <button
-                                    class="text-error py-1"
-                                    onclick="newNotebook_modal.showModal()"
-                                >
+                                <span class="text-error py-1">
                                     <i class="bi bi-plus-square text-lg" />
-                                </button>
+                                </span>
                             </div>
-                        </li>
-                    </ul>
+                        </button>
+                    </div>
                 </div>
                 <div class="m-2">
                     <div
@@ -193,34 +196,33 @@
                     <div class="">
                         <SearchForm />
                     </div>
-                    <div class="w-full px-4 overflow-y-auto">
-                        {#each notebook.entries as entry}
-                            <button
-                                class="btn-block text-left py-4 focus:outline-none {view !=
-                                undefined
-                                    ? entry.title === view.title
-                                        ? 'text-black dark:text-white'
-                                        : 'text-gray-700 dark:text-gray-300 hover:text-black hover:dark:text-white'
-                                    : 'text-gray-700 dark:text-gray-300 hover:text-black hover:dark:text-white'}"
-                                on:click={showEntry(entry.title)}
+                </div>
+                <div class="w-full px-4 overflow-y-auto mt-24">
+                    {#each notebook.entries as entry}
+                        <button
+                            class="btn-block text-left py-4 focus:outline-none {view !=
+                            undefined
+                                ? entry.id === view.id
+                                    ? 'text-black dark:text-white'
+                                    : 'text-gray-700 dark:text-gray-300 hover:text-black hover:dark:text-white'
+                                : 'text-gray-700 dark:text-gray-300 hover:text-black hover:dark:text-white'}"
+                            on:click={showEntry(entry.id)}
+                        >
+                            <div
+                                class="px-3 border-l-4 {view != undefined
+                                    ? entry.id === view.id
+                                        ? 'border-accent'
+                                        : 'border-transparent'
+                                    : 'border-transparent'}"
                             >
-                                <div
-                                    class="px-3 border-l-4 {view != undefined
-                                        ? entry.title === view.title
-                                            ? 'border-accent'
-                                            : 'border-transparent'
-                                        : 'border-transparent'}
-							"
-                                >
-                                    <div class="text-xs opacity-60">
-                                        {entry.created_at}
-                                    </div>
-                                    <div class="font-medium">{entry.title}</div>
+                                <div class="text-xs opacity-60">
+                                    {entry.created_at}
                                 </div>
-                            </button>
-                            <hr class="border-secondary border-opacity-50" />
-                        {/each}
-                    </div>
+                                <div class="font-medium">{entry.title}</div>
+                            </div>
+                        </button>
+                        <hr class="border-secondary border-opacity-50" />
+                    {/each}
                 </div>
             </div>
         </div>
@@ -235,17 +237,12 @@
                         class="flex justify-between items-center h-12 px-16 border-b border-secondary border-opacity-50"
                     >
                         <div class="">
-                            <span class="text-sm italic"
-                                >{prettyDate(
-                                    view.date,
-                                    "yyyy-MM-dd",
-                                    "EEEE, MMMM d, yyyy"
-                                )}</span
+                            <span class="text-sm italic">{view.created_at}</span
                             >
                             <span class="mx-2">|</span>
                             <span
                                 class="badge badge-accent text-white rounded font-black"
-                                >{view.time}</span
+                                >{view.created_at}</span
                             >
                         </div>
                         <div class="">
@@ -287,7 +284,7 @@
     title="New entry"
     classes="border-secondary w-7/12 max-w-5xl text-slate-900 dark:text-slate-50"
 >
-    <NewEntryForm />
+    <NewEntryForm notebook={notebook.id} />
 </Modal>
 
 <Modal

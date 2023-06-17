@@ -17,6 +17,7 @@
     "dependencies": {
         "@inertiajs/svelte": "^1.0.7",
         "@sveltejs/vite-plugin-svelte": "^2.4.1",
-        "bootstrap-icons": "^1.10.5"
+        "bootstrap-icons": "^1.10.5",
+        "date-fns": "^2.30.0"
     }
 }
