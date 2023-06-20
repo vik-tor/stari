@@ -2,12 +2,12 @@
     import { useForm } from "@inertiajs/svelte";
     import { format } from "date-fns";
 
-    export let notebook;
+    export let notebook_id;
 
     const entryForm = useForm({
         title: "",
         body: "",
-        notebook_id: notebook,
+        notebook_id: notebook_id,
         tags: [],
         created_at: format(Date.now(), "yyyy-MM-dd hh:mm:ss"),
     });
@@ -32,6 +32,7 @@
     // simplified (quicknotes, snippets)
 
     const submitEntryForm = () => {
+        console.log(notebook_id);
         $entryForm.post("entries", {});
     };
 </script>
@@ -126,6 +127,19 @@
                         </label>
                     {/if}
                 </div>
+                <div class="form-control">
+                    <label class="label font-medium" for="notebook">
+                        <span
+                            class="label-text text-xs text-slate-900 dark:text-slate-50"
+                            >Notebook</span
+                        >
+                    </label>
+                    <input
+                        type="text"
+                        class="input input-sm bg-neutral placeholder-gray-500 rounded"
+                        placeholder={notebook_id}
+                    />
+                </div>
             </div>
         </div>
         <div
@@ -154,10 +168,12 @@
                     {/if}
                 </div>
                 <div class="flex justify-end gap-2 mt-3">
-                    <button
+                    <input
                         class="btn btn-neutral btn-ghost btn-sm max-xs:btn-block ml-auto text-xs rounded"
-                        >Cancel</button
-                    >
+                        type="button"
+                        value="Cancel"
+                        onclick="newEntryModal.close()"
+                    />
                     <button
                         class="btn btn-accent btn-sm max-xs:btn-block text-white text-xs rounded"
                         type="submit"

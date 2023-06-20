@@ -16,7 +16,7 @@ class EntryController extends Controller
 		Entry::create($request->validate([
 			'title' => 'required|string|max:255',
 			'body' => 'required',
-			'notebook_id' => 'required',
+			'notebook_id' => 'required'
 		]));
 
 		return to_route('app');
@@ -30,7 +30,6 @@ class EntryController extends Controller
 		$entry->update($request->validate([
 			'title' => 'required|string|max:255',
 			'body' => 'required',
-			'notebook_id' => 'json',
 		]));
 
 		return to_route('app');
