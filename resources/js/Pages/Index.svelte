@@ -17,6 +17,7 @@
 
 	// Define notebook, entries
 	let notebook;
+	let activeNotebook;
 	let entries;
 
 	// Function to load initial state (default notebook to show)
@@ -46,7 +47,6 @@
 				preserveScroll: true,
 			}
 		);
-		console.log(notebooks);
 		listEntries(id);
 	};
 
