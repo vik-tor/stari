@@ -43,7 +43,7 @@
 		<div
 			class={`modal__content ${className ? className : ""} ${
 				size == "normal"
-					? "w-5/12 max-w-2xl"
+					? "w-5/12 max-w-3xl"
 					: size == "small"
 					? "w-9/12 md:w-6/12 lg:w-4/12 max-w-sm"
 					: size == "wide"

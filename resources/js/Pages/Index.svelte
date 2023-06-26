@@ -1,8 +1,8 @@
 <script>
 	import "../../css/app.css";
-	//import Modal from "../Components/Modal.svelte";
+	import { router } from "@inertiajs/svelte";
+
 	import AppSettingsForm from "./Partials/AppSettingsForm.svelte";
-	import NewEntryForm from "./Partials/NewEntryForm.svelte";
 	import NewNotebookForm from "./Partials/NewNotebookForm.svelte";
 	import NotebookSettingsForm from "./Partials/NotebookSettingsForm.svelte";
 	import RemoveNotebookForm from "./Partials/RemoveNotebookForm.svelte";
@@ -15,22 +15,47 @@
 	export let notebooks;
 	export let categories;
 
+	// Define notebook, entries
+	let notebook;
+	let entries;
+
+	// Function to load initial state (default notebook to show)
+	$: notebook = notebooks[0];
+	$: entries = notebook.entries;
+
+	// List entries and view entry functions must be unlinked from these initial definitions
+	// ie, check the current notebook to list entries
+	// same case with the view - check the current entry
+	// On creating an entry, check the newest addition and select it
+	// Edit the entry inline: view should be a synced WYSIWYG editor, plus title & tag input
+	// Add the trash entry logic
+
 	let closeModal = false;
-	let notebook = notebooks[0];
+
 	let view = null;
-	let newEntry = {
-		title: "Title",
-		body: "",
-		notebook_id: notebook.id,
-		tags: [],
-		created_at: format(Date.now(), "yyyy-MM-dd hh:mm:ss"),
+	let newEntry = null;
+
+	const createEntry = (id) => {
+		router.post(
+			"entries",
+			{
+				notebook_id: id,
+			},
+			{
+				resetOnSuccess: false,
+				preserveScroll: true,
+			}
+		);
+		console.log(notebooks);
+		listEntries(id);
 	};
 
 	const listEntries = (id) => {
-		notebook = notebooks.find((obj) => {
+		let nb = notebooks.find((obj) => {
 			return obj.id == id;
 		});
-		notebook = notebook;
+		notebook = nb;
+		entries = notebook.entries;
 	};
 	const showEntry = (id) => {
 		view = notebook.entries.find((o) => {
@@ -54,11 +79,11 @@
 			<div class="flex flex-col items-center justify-between h-full">
 				<div class="flex flex-col items-center">
 					<!-- <div class="flex flex-col items-center h-3 my-4">
-                        <button class="focus:outline-none">
-                            <i class="bi bi-card-heading text-lg" />
-                        </button>
-                        <img src="../../../logo.png" alt="Logo" class="w-4" />
-                    </div> -->
+						<button class="focus:outline-none">
+							<i class="bi bi-card-heading text-lg" />
+						</button>
+						<img src="../../../logo.png" alt="Logo" class="w-4" />
+					</div> -->
 					<div class="flex flex-col w-full items-center">
 						{#each notebooks as nb}
 							<button
@@ -102,23 +127,31 @@
 					</div>
 				</div>
 				<div class="m-2">
-					<Modal>
-						<Content
-							class="rounded border bg-primary border-secondary w-2/12 max-w-xs h-[400px] text-slate-900 dark:text-slate-50 py-3"
-							title="App Settings"
-						>
-							<AppSettingsForm {notebooks} />
-						</Content>
-						<Trigger>
-							<div class="md:tooltip md:tooltip-right" data-tip="Settings">
-								<button
-									class="btn btn-ghost btn-circle bg-none p-1 hover:bg-transparent hover:border-transparent w-8 h-8"
-								>
-									<i class="bi bi-gear text-lg" />
-								</button>
-							</div>
-						</Trigger>
-					</Modal>
+					<div class="md:tooltip md:tooltip-right" data-tip="Trashed">
+						<button
+							class="btn btn-ghost btn-circle bg-none p-1 hover:bg-transparent hover:border-transparent w-8 h-8"
+							><i class="bi bi-trash text-lg" />
+						</button>
+					</div>
+					<div>
+						<Modal>
+							<Content
+								class="rounded border bg-primary border-secondary w-2/12 max-w-xs h-[400px] text-slate-900 dark:text-slate-50 py-3"
+								title="App Settings"
+							>
+								<AppSettingsForm {notebooks} />
+							</Content>
+							<Trigger>
+								<div class="md:tooltip md:tooltip-right" data-tip="Settings">
+									<button
+										class="btn btn-ghost btn-circle bg-none p-1 hover:bg-transparent hover:border-transparent w-8 h-8"
+									>
+										<i class="bi bi-gear text-lg" />
+									</button>
+								</div>
+							</Trigger>
+						</Modal>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -143,6 +176,7 @@
 									class="btn btn-ghost btn-circle bg-none px-1 hover:bg-transparent hover:border-transparent w-8 h-8 {notebook
 										? ''
 										: 'disabled'}"
+									on:click={createEntry(notebook.id)}
 								>
 									<i class="bi bi-plus-lg text-lg" />
 								</button>
@@ -221,39 +255,57 @@
 					</div>
 				</div>
 				<div class="w-full px-4 overflow-y-auto mt-24">
-					<button class="btn-block text-left py-4 focus:outline-none">
-						<div class="px-3 border-l-4">
-							<div class="text-xs opacity-60">
-								{newEntry.created_at}
-							</div>
-							<div class="font-medium">{newEntry.title}</div>
-						</div>
-					</button>
-					{#each notebook.entries as entry}
+					{#if newEntry}
 						<button
 							class="btn-block text-left py-4 focus:outline-none {view !=
 							undefined
-								? entry.id === view.id
+								? newEntry.id === view.id
 									? 'text-black dark:text-white'
 									: 'text-gray-700 dark:text-gray-300 hover:text-black hover:dark:text-white'
 								: 'text-gray-700 dark:text-gray-300 hover:text-black hover:dark:text-white'}"
-							on:click={showEntry(entry.id)}
+							on:click={showEntry(newEntry.id)}
 						>
 							<div
 								class="px-3 border-l-4 {view != undefined
-									? entry.id === view.id
+									? newEntry.id === view.id
 										? 'border-accent'
 										: 'border-transparent'
 									: 'border-transparent'}"
 							>
 								<div class="text-xs opacity-60">
-									{entry.created_at}
+									{newEntry.created_at}
 								</div>
-								<div class="font-medium">{entry.title}</div>
+								<div class="font-medium">{newEntry.title}</div>
 							</div>
 						</button>
-						<hr class="border-secondary border-opacity-50" />
-					{/each}
+					{/if}
+					{#if notebook}
+						{#each entries as entry}
+							<button
+								class="btn-block text-left py-4 focus:outline-none {view !=
+								undefined
+									? entry.id === view.id
+										? 'text-black dark:text-white'
+										: 'text-gray-700 dark:text-gray-300 hover:text-black hover:dark:text-white'
+									: 'text-gray-700 dark:text-gray-300 hover:text-black hover:dark:text-white'}"
+								on:click={showEntry(entry.id)}
+							>
+								<div
+									class="px-3 border-l-4 {view != undefined
+										? entry.id === view.id
+											? 'border-accent'
+											: 'border-transparent'
+										: 'border-transparent'}"
+								>
+									<div class="text-xs opacity-60">
+										{entry.created_at}
+									</div>
+									<div class="font-medium">{entry.title}</div>
+								</div>
+							</button>
+							<hr class="border-secondary border-opacity-50" />
+						{/each}
+					{/if}
 				</div>
 			</div>
 		</div>
@@ -302,16 +354,11 @@
 											</ul>
 										</Content>
 										<Trigger>
-											<div
-												class="md:tooltip md:tooltip-right"
-												data-tip="Settings"
+											<button
+												class="btn btn-ghost btn-circle bg-none p-1 hover:bg-transparent hover:border-transparent w-8 h-8"
 											>
-												<button
-													class="btn btn-ghost btn-circle bg-none p-1 hover:bg-transparent hover:border-transparent w-8 h-8"
-												>
-													<i class="bi bi-info-circle text-lg" />
-												</button>
-											</div>
+												<i class="bi bi-info-circle text-lg" />
+											</button>
 										</Trigger>
 									</Modal>
 								</div>
@@ -326,22 +373,28 @@
 								</label>
 								<ul
 									tabindex="-1"
-									class="dropdown-content menu p-1 bg-primary shadow rounded w-40 gap-1"
+									class="dropdown-content menu bg-primary shadow rounded w-40 p-0"
 								>
 									<li>
-										<button
-											class="justify-start items-center no-underline capitalize px-2 py-1 hover:no-underline text-slate-900 dark:text-slate-50"
+										<label
+											for="editor"
+											class="label p-0 cursor-pointer w-full rounded py-2 px-4 text-slate-900 dark:text-slate-50 hover:bg-base-100 hover:bg-opacity-20 hover:text-error-content"
 										>
-											<i class="bi bi-sliders2 text-lg" />
-											<span class="text-xs font-medium">Options</span>
-										</button>
+											<span
+												class="label-text text-sm text-slate-900 dark:text-slate-50"
+												>Rich editor</span
+											>
+											<input type="checkbox" name="editor" id="editor" />
+										</label>
 									</li>
+									<hr
+										class="w-full border border-secondary border-opacity-50 p-0 m-0"
+									/>
 									<li>
 										<button
-											class="justify-start items-center no-underline capitalize px-2 py-1 hover:no-underline text-error"
+											class="py-2 px-4 rounded text-error hover:bg-error hover:bg-opacity-20 hover:text-error-content"
 										>
-											<i class="bi bi-trash text-lg" />
-											<span class="text-xs font-medium">Move to trash</span>
+											<span class="text-sm font-medium">Move to trash</span>
 										</button>
 									</li>
 								</ul>

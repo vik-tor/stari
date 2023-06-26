@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Entry;
+use App\Models\Notebook;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redirect;
 
 class EntryController extends Controller
 {
@@ -12,14 +14,10 @@ class EntryController extends Controller
 	 */
 	public function store(Request $request)
 	{
-		// Insert to tags & entry_tag tables on create
-		Entry::create($request->validate([
-			'title' => 'required|string|max:255',
-			'body' => 'required',
-			'notebook_id' => 'required'
-		]));
+		$notebook = Notebook::find($request->notebook_id);
+		$entry = Entry::factory()->for($notebook)->create();
 
-		return to_route('app');
+		return redirect()->back();
 	}
 
 	/**
